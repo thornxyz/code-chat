@@ -32,7 +32,7 @@ function Home() {
 
   return (
     <div className="w-screen flex flex-col items-center bg-sky-950 h-screen text-white pt-12">
-      <div className="text-3xl font-semibold my-8">
+      <div className="text-2xl font-bold my-4" style={{ marginTop: '100px' }}>
         Paste invitation for Room Id
       </div>
       <div className="flex flex-col w-1/2 items-center gap-3">
