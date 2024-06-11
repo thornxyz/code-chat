@@ -13,6 +13,7 @@ import {
 
 function EditorPage() {
   const socketRef = useRef(null);
+  const codeRef = useRef(null);
   const location = useLocation();
   const reactNavigator = useNavigate();
   const { roomId } = useParams();
@@ -44,6 +45,10 @@ function EditorPage() {
             console.log(`${username} joined`);
           }
           setClients(clients);
+          socketRef.current.emit(ACTIONS.SYNC_CODE, {
+            code: codeRef.current,
+            socketId,
+          });
         }
       );
 
@@ -64,6 +69,20 @@ function EditorPage() {
     };
   }, []);
 
+  async function copyRoomId() {
+    try {
+      await navigator.clipboard.writeText(roomId);
+      toast.success("Room ID copied to clipboard");
+    } catch (err) {
+      toast.error("Failed to copy room ID");
+      console.error(err);
+    }
+  }
+
+  function leaveRoom() {
+    reactNavigator("/");
+  }
+
   if (!location.state) {
     return <Navigate to="/" />;
   }
@@ -83,16 +102,28 @@ function EditorPage() {
           </div>
         </div>
         <div className="flex flex-col">
-          <button className="bg-green-700 px-4 py-1 mt-2 text-xl font-semibold rounded-lg hover:bg-green-900">
+          <button
+            onClick={copyRoomId}
+            className="bg-green-700 px-4 py-1 mt-2 text-xl font-semibold rounded-lg hover:bg-green-900"
+          >
             Copy Room Id
           </button>
-          <button className="bg-red-700 px-4 py-1 mt-2 text-xl font-semibold rounded-lg hover:bg-red-900">
+          <button
+            onClick={leaveRoom}
+            className="bg-red-700 px-4 py-1 mt-2 text-xl font-semibold rounded-lg hover:bg-red-900"
+          >
             Leave
           </button>
         </div>
       </div>
       <div>
-        <Editor socketRef={socketRef} roomId={roomId} />
+        <Editor
+          socketRef={socketRef}
+          roomId={roomId}
+          onCodeChange={(code) => {
+            codeRef.current = code;
+          }}
+        />
       </div>
     </div>
   );

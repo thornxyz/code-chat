@@ -1,12 +1,13 @@
-import { useState, useRef, useEffect } from "react";
-import { Controlled as CodeMirror } from "react-codemirror2";
+import { useRef, useEffect } from "react";
+import { UnControlled as CodeMirror } from "react-codemirror2";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
 import "codemirror/mode/javascript/javascript";
+import "codemirror/addon/edit/closetag";
+import "codemirror/addon/edit/closebrackets";
 import ACTIONS from "../../Actions";
 
-const Editor = ({ socketRef, roomId }) => {
-  const [value, setValue] = useState("");
+const Editor = ({ socketRef, roomId, onCodeChange }) => {
   const editorRef = useRef();
 
   useEffect(() => {
@@ -25,18 +26,17 @@ const Editor = ({ socketRef, roomId }) => {
   return (
     <div style={{ width: "calc(100vw - 200px)" }}>
       <CodeMirror
-        value={value}
         options={{
           lineNumbers: true,
           theme: "dracula",
           mode: "javascript",
-        }}
-        onBeforeChange={(editor, data, value) => {
-          setValue(value);
+          autoCloseTags: true,
+          autoCloseBrackets: true,
         }}
         onChange={(editor, data, value) => {
           const { origin } = data;
           const code = value;
+          onCodeChange(code);
           if (origin !== "setValue") {
             socketRef.current.emit(ACTIONS.CODE_CHANGE, { roomId, code });
           }

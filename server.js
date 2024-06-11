@@ -1,11 +1,21 @@
 import express from 'express';
 import http from 'http';
+import path from 'path';
 import { Server } from 'socket.io';
 import ACTIONS from './Actions.js';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+app.use(express.static('dist'));
+app.use((req, res, next) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+})
 
 const userSocketMap = {};
 
@@ -36,6 +46,10 @@ io.on('connection', (socket) => {
 
     socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
         socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code });
+    });
+
+    socket.on(ACTIONS.SYNC_CODE, ({ socketId, code }) => {
+        io.to(socketId).emit(ACTIONS.CODE_CHANGE, { code });
     });
 
     socket.on('disconnecting', () => {
