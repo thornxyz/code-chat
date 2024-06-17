@@ -18,6 +18,7 @@ app.use((req, res, next) => {
 })
 
 const userSocketMap = {};
+const roomMessages = {};
 
 function getAllConnectedClients(roomId) {
     return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map((socketId) => {
@@ -29,15 +30,20 @@ function getAllConnectedClients(roomId) {
 }
 
 io.on('connection', (socket) => {
+    console.log('a user connected', socket.id);
+
     socket.on(ACTIONS.JOIN, ({ roomId, username }) => {
         userSocketMap[socket.id] = username;
         socket.join(roomId);
         const clients = getAllConnectedClients(roomId);
+        const messages = roomMessages[roomId] || [];
+
         clients.forEach(({ socketId }) => {
             io.to(socketId).emit(ACTIONS.JOINED, {
                 clients,
                 username,
                 socketId: socket.id,
+                messages
             });
         });
     });
@@ -63,6 +69,10 @@ io.on('connection', (socket) => {
     });
 
     socket.on("send_message", (data) => {
+        if (!roomMessages[data.room]) {
+            roomMessages[data.room] = [];
+        }
+        roomMessages[data.room].push(data);
         socket.to(data.room).emit("receive_message", data);
     });
 });

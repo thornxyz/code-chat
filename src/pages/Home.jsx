@@ -32,14 +32,14 @@ function Home() {
 
   return (
     <div className="w-screen flex flex-col items-center bg-sky-950 h-screen text-white pt-12">
-      <div className="text-2xl font-bold my-4" style={{ marginTop: '100px' }}>
+      <div className="text-2xl font-bold mb-8" style={{ marginTop: "20vh" }}>
         Paste invitation for Room Id
       </div>
-      <div className="flex flex-col w-1/2 items-center gap-3">
+      <div className="flex flex-col w-1/2 items-center gap-4">
         <input
           type="text"
           className="px-2 py-1 rounded-sm text-black"
-          style={{ width: "350px" }}
+          style={{ width: "30vw" }}
           placeholder="Room Id"
           onChange={(e) => setRoomId(e.target.value)}
           value={roomId}
@@ -48,7 +48,7 @@ function Home() {
         <input
           type="text"
           className="px-2 py-1 rounded-sm text-black"
-          style={{ width: "350px" }}
+          style={{ width: "30vw" }}
           placeholder="Username"
           onChange={(e) => setUsername(e.target.value)}
           value={username}
@@ -60,16 +60,16 @@ function Home() {
         >
           Join
         </button>
-        <span>
+        <div className="mt-4">
           If you dont have an invite then create &nbsp;
-          <a
+          <span
             onClick={createNewRoom}
-            className="text-green-600 hover:text-green-800 font-semibold"
+            className="bg-green-700 hover:bg-green-900 px-2 py-1 rounded-md font-semibold cursor-pointer"
             href=""
           >
             New Room
-          </a>
-        </span>
+          </span>
+        </div>
       </div>
     </div>
   );

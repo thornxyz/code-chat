@@ -3,30 +3,30 @@
 @tailwind utilities;
 
 .CodeMirror {
-    height: 100vh !important;
-    font-size: 16px;
-    line-height: 1.6;
-    padding-top: 20px;
+  height: 93.8vh !important;
+  font-size: 16px;
+  line-height: 1.6;
+  padding-top: 20px;
 }
 
 /* width */
 ::-webkit-scrollbar {
-    width: 6px;
+  width: 6px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-    background: #1F2937;
+  background: #1f2937;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 20px;
-    border: 2px solid #1F2937;
+  background: #888;
+  border-radius: 20px;
+  border: 2px solid #1f2937;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background: #555;
+  background: #555;
 }

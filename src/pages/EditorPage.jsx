@@ -1,12 +1,16 @@
-
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import Client from "../components/Client";
 import Editor from "../components/Editor";
 import { initSocket } from "../socket";
 import ACTIONS from "../../Actions";
-import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  Navigate,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import Chat from "../components/Chat";
+import Navbar from "../components/Navbar";
 
 function EditorPage() {
   const socketRef = useRef(null);
@@ -33,45 +37,60 @@ function EditorPage() {
         username: location.state?.username,
       });
 
-      socketRef.current.on(ACTIONS.JOINED, ({ clients, username, socketId }) => {
-        if (username !== location.state?.username) {
-          toast.success(`${username} joined the room.`);
+      socketRef.current.on(
+        ACTIONS.JOINED,
+        ({ clients: newClients, username, socketId }) => {
+          setClients(newClients);
+          socketRef.current.emit(ACTIONS.SYNC_CODE, {
+            code: codeRef.current,
+            socketId,
+          });
         }
-        setClients(clients);
-        socketRef.current.emit(ACTIONS.SYNC_CODE, {
-          code: codeRef.current,
-          socketId,
-        });
-      });
+      );
 
       socketRef.current.on(ACTIONS.DISCONNECTED, ({ socketId, username }) => {
-        toast.success(`${username} left the room.`);
-        setClients((prev) => prev.filter((client) => client.socketId !== socketId));
+        setClients((prevClients) =>
+          prevClients.filter((client) => client.socketId !== socketId)
+        );
       });
     };
 
     init();
 
     return () => {
-      socketRef.current.off(ACTIONS.JOINED);
-      socketRef.current.off(ACTIONS.DISCONNECTED);
-      socketRef.current.disconnect();
+      if (socketRef.current) {
+        socketRef.current.off(ACTIONS.JOINED);
+        socketRef.current.off(ACTIONS.DISCONNECTED);
+        socketRef.current.disconnect();
+      }
     };
   }, [reactNavigator, roomId, location.state?.username]);
 
-  const copyRoomId = async () => {
-    try {
-      await navigator.clipboard.writeText(roomId);
-      toast.success("Room ID copied to clipboard");
-    } catch (err) {
-      toast.error("Failed to copy room ID");
-      console.error(err);
-    }
-  };
+  useEffect(() => {
+    if (socketRef.current) {
+      const handleJoin = ({ clients: newClients, username }) => {
+        if (username !== location.state?.username) {
+          toast.success(`${username} joined the room.`);
+        }
+        setClients(newClients);
+      };
 
-  const leaveRoom = () => {
-    reactNavigator("/");
-  };
+      const handleDisconnect = ({ socketId, username }) => {
+        toast.success(`${username} left the room.`);
+        setClients((prevClients) =>
+          prevClients.filter((client) => client.socketId !== socketId)
+        );
+      };
+
+      socketRef.current.on(ACTIONS.JOINED, handleJoin);
+      socketRef.current.on(ACTIONS.DISCONNECTED, handleDisconnect);
+
+      return () => {
+        socketRef.current.off(ACTIONS.JOINED, handleJoin);
+        socketRef.current.off(ACTIONS.DISCONNECTED, handleDisconnect);
+      };
+    }
+  }, [location.state?.username, socketRef.current]);
 
   if (!location.state) {
     return <Navigate to="/" />;
@@ -79,40 +98,20 @@ function EditorPage() {
 
   return (
     <div className="flex flex-col w-screen h-screen bg-sky-950 text-white">
-      <div className="flex justify-between my-1 mx-2" >
-        <div>
-          <div className="flex gap-2 justify-center items-center flex-wrap">
-            {clients.map((client) => (
-              <Client key={client.socketId} username={client.username} />
-            ))}
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={copyRoomId}
-            className="bg-green-700 px-4 py-1 text-sm font-semibold rounded-lg hover:bg-green-900"
-          >
-            Copy Room Id
-          </button>
-          <button
-            onClick={leaveRoom}
-            className="bg-red-700 px-4 py-1 text-sm font-semibold rounded-lg hover:bg-red-900"
-          >
-            Leave
-          </button>
-        </div>
-      </div>
-      <div className="flex">
-        <div >
-          <Editor
-            socketRef={socketRef}
-            roomId={roomId}
-            onCodeChange={(code) => {
-              codeRef.current = code;
-            }}
-          />
-        </div>
-        <Chat socketRef={socketRef} username={location.state.username} room={roomId} />
+      <Navbar clients={clients} roomId={roomId} />
+      <div className="flex border-t">
+        <Editor
+          socketRef={socketRef}
+          roomId={roomId}
+          onCodeChange={(code) => {
+            codeRef.current = code;
+          }}
+        />
+        <Chat
+          socketRef={socketRef}
+          username={location.state.username}
+          room={roomId}
+        />
       </div>
     </div>
   );
