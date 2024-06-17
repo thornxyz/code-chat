@@ -12,10 +12,10 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-app.use(express.static('dist'));
-app.use((req, res, next) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-})
+// app.use(express.static('dist'));
+// app.use((req, res, next) => {
+//     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+// })
 
 const userSocketMap = {};
 
@@ -63,7 +63,11 @@ io.on('connection', (socket) => {
         delete userSocketMap[socket.id];
         socket.leave();
     });
+
+    socket.on("send_message", (data) => {
+        socket.to(data.room).emit("receive_message", data);
+    });
 });
 
 const PORT = 5000;
-server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+server.listen(PORT, () => { console.log(`Listening on port ${PORT}`) });
