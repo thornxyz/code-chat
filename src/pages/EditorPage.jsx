@@ -78,41 +78,40 @@ function EditorPage() {
   }
 
   return (
-    <div className="flex w-screen h-screen bg-sky-950 text-white">
-      <div className="border-r-2 border-black h-screen p-2 flex flex-col justify-between" style={{ width: "200px" }}>
+    <div className="flex flex-col w-screen h-screen bg-sky-950 text-white">
+      <div className="flex justify-between my-1 mx-2" >
         <div>
-          <h3 className="text-center font-bold text-lg">Connected</h3>
-          <div className="flex gap-4 justify-center items-center flex-wrap p-4">
+          <div className="flex gap-2 justify-center items-center flex-wrap">
             {clients.map((client) => (
               <Client key={client.socketId} username={client.username} />
             ))}
           </div>
         </div>
-        <div className="flex flex-col">
+        <div className="flex gap-2">
           <button
             onClick={copyRoomId}
-            className="bg-green-700 px-4 py-1 mt-2 text-xl font-semibold rounded-lg hover:bg-green-900"
+            className="bg-green-700 px-4 py-1 text-sm font-semibold rounded-lg hover:bg-green-900"
           >
             Copy Room Id
           </button>
           <button
             onClick={leaveRoom}
-            className="bg-red-700 px-4 py-1 mt-2 text-xl font-semibold rounded-lg hover:bg-red-900"
+            className="bg-red-700 px-4 py-1 text-sm font-semibold rounded-lg hover:bg-red-900"
           >
             Leave
           </button>
         </div>
       </div>
-      <div >
-        <Editor
-          socketRef={socketRef}
-          roomId={roomId}
-          onCodeChange={(code) => {
-            codeRef.current = code;
-          }}
-        />
-      </div>
-      <div >
+      <div className="flex">
+        <div >
+          <Editor
+            socketRef={socketRef}
+            roomId={roomId}
+            onCodeChange={(code) => {
+              codeRef.current = code;
+            }}
+          />
+        </div>
         <Chat socketRef={socketRef} username={location.state.username} room={roomId} />
       </div>
     </div>

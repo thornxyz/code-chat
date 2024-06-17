@@ -11,13 +11,13 @@ function Chat({ socketRef, username, room }) {
             const messageData = {
                 room: room,
                 author: username,
-                message: currentMessage,
+                message: currentMessage.trim(),
                 time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
             };
 
             if (socketRef.current) {
                 await socketRef.current.emit("send_message", messageData);
-                setMessageList((list) => [...list, messageData]);
+                setMessageList((prevMessages) => [...prevMessages, messageData]);
                 setCurrentMessage("");
             }
         }
@@ -31,7 +31,7 @@ function Chat({ socketRef, username, room }) {
 
     useEffect(() => {
         const handleMessageReceive = (data) => {
-            setMessageList((list) => [...list, data]);
+            setMessageList((prevMessages) => [...prevMessages, data]);
         };
 
         if (socketRef.current) {
@@ -43,7 +43,7 @@ function Chat({ socketRef, username, room }) {
                 socketRef.current.off("receive_message", handleMessageReceive);
             }
         };
-    }, [socketRef]);
+    }, [socketRef.current]);
 
     useEffect(() => {
         scrollToBottom();
@@ -51,35 +51,33 @@ function Chat({ socketRef, username, room }) {
 
 
     return (
-        <div className='border-l flex flex-col justify-center bg-gray-800' style={{ height: "100vh" }}>
-            <div className='bg-gray-800 text-white py-2 px-1 overflow-auto' style={{ height: "90vh", width: "300px" }} ref={messageEndRef}>
-                {messageList.map((msg, index) => {
-                    return (
-                        <div className='mb-1' key={index}>
-                            {username === msg.author ? (
-                                <div className='flex flex-col items-end'>
-                                    <div className='bg-green-800 rounded-md px-1 py-0.5 text-sm' style={{ width: "160px", wordWrap: "break-word", overflowWrap: "break-word", whiteSpace: "normal" }}>
-                                        <p>{msg.message}</p>
-                                    </div>
-                                    <div className='flex gap-1' style={{ fontSize: "11px" }}>
-                                        <p>{msg.time}</p>
-                                        <p className='font-semibold'>{msg.author}</p>
-                                    </div>
+        <div className='border-l flex flex-col justify-center bg-gray-800'>
+            <div className='bg-gray-800 text-white py-2 px-1 overflow-auto h-full' style={{ width: "300px" }} ref={messageEndRef}>
+                {messageList.map((msg, index) => (
+                    <div className='mb-1' key={index}>
+                        {username === msg.author ? (
+                            <div className='flex flex-col items-end'>
+                                <div className='bg-green-800 rounded-md px-1 py-0.5 text-sm' style={{ width: "160px", wordWrap: "break-word", overflowWrap: "break-word", whiteSpace: "normal" }}>
+                                    <p>{msg.message}</p>
                                 </div>
-                            ) : (
-                                <>
-                                    <div className='bg-gray-600 rounded-md px-1 py-0.5 text-sm' style={{ width: "160px", wordWrap: "break-word", overflowWrap: "break-word", whiteSpace: "normal" }}>
-                                        <p>{msg.message}</p>
-                                    </div>
-                                    <div className='flex gap-1' style={{ fontSize: "11px" }}>
-                                        <p>{msg.time}</p>
-                                        <p className='font-semibold'>{msg.author}</p>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    )
-                })}
+                                <div className='flex gap-1' style={{ fontSize: "11px" }}>
+                                    <p>{msg.time}</p>
+                                    <p className='font-semibold'>{msg.author}</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <div className='bg-gray-600 rounded-md px-1 py-0.5 text-sm' style={{ width: "160px", wordWrap: "break-word", overflowWrap: "break-word", whiteSpace: "normal" }}>
+                                    <p>{msg.message}</p>
+                                </div>
+                                <div className='flex gap-1' style={{ fontSize: "11px" }}>
+                                    <p>{msg.time}</p>
+                                    <p className='font-semibold'>{msg.author}</p>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                ))}
             </div>
             <div className='flex justify-between mt-1'>
                 <input type="text" className="border-black border px-2 py-1 text-black rounded-sm w-full text-sm" onKeyDown={(event) => { event.key === "Enter" && sendMessage(); }} placeholder='Enter your message' value={currentMessage} onChange={(event) => { setCurrentMessage(event.target.value); }} />
@@ -88,7 +86,7 @@ function Chat({ socketRef, username, room }) {
                 </button>
             </div>
         </div>
-    )
+    );
 }
 
 export default Chat;

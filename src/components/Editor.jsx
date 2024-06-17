@@ -24,7 +24,7 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
   }, [socketRef.current]);
 
   return (
-    <div style={{ width: "calc(100vw - 500px)" }}>
+    <div style={{ width: "calc(100vw - 300px)" }}>
       <CodeMirror
         options={{
           lineNumbers: true,

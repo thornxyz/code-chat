@@ -12,10 +12,10 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// app.use(express.static('dist'));
-// app.use((req, res, next) => {
-//     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-// })
+app.use(express.static('dist'));
+app.use((req, res, next) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+})
 
 const userSocketMap = {};
 
@@ -29,8 +29,6 @@ function getAllConnectedClients(roomId) {
 }
 
 io.on('connection', (socket) => {
-    console.log('socket connected ', socket.id);
-
     socket.on(ACTIONS.JOIN, ({ roomId, username }) => {
         userSocketMap[socket.id] = username;
         socket.join(roomId);
