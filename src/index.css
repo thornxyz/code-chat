@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 .CodeMirror {
-  height: 93.8vh !important;
+  height: 88.3vh !important;
   font-size: 16px;
   line-height: 1.6;
-  padding-top: 20px;
+  padding-top: 5px;
 }
 
 /* width */
