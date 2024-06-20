@@ -38,18 +38,19 @@ function Chat({ socketRef, username, room }) {
       setMessageList((prevMessages) => [...prevMessages, data]);
     };
 
+    const handleJoin = ({ messages }) => {
+      setMessageList(messages);
+    };
+
     if (socketRef.current) {
       socketRef.current.on("receive_message", handleMessageReceive);
-
-      socketRef.current.on(ACTIONS.JOINED, ({ messages }) => {
-        setMessageList(messages);
-      });
+      socketRef.current.on(ACTIONS.JOINED, handleJoin);
     }
 
     return () => {
       if (socketRef.current) {
         socketRef.current.off("receive_message", handleMessageReceive);
-        socketRef.current.off(ACTIONS.JOINED);
+        socketRef.current.off(ACTIONS.JOINED, handleJoin);
       }
     };
   }, [socketRef.current]);
@@ -107,7 +108,7 @@ function Chat({ socketRef, username, room }) {
           </div>
         ))}
       </div>
-      <div className="flex justify-between m-1">
+      <div className="flex justify-between m-1 mb-4">
         <input
           type="text"
           className="border-black border px-2 py-1 text-black rounded-sm w-full text-sm"

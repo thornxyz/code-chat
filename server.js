@@ -38,6 +38,13 @@ io.on('connection', (socket) => {
         const clients = getAllConnectedClients(roomId);
         const messages = roomMessages[roomId] || [];
 
+        socket.emit(ACTIONS.JOINED, {
+            clients,
+            username,
+            socketId: socket.id,
+            messages,
+        });
+
         clients.forEach(({ socketId }) => {
             io.to(socketId).emit(ACTIONS.JOINED, {
                 clients,
@@ -63,6 +70,13 @@ io.on('connection', (socket) => {
                 socketId: socket.id,
                 username: userSocketMap[socket.id],
             });
+
+            setTimeout(() => {
+                const remainingClients = getAllConnectedClients(roomId);
+                if (remainingClients.length === 0) {
+                    delete roomMessages[roomId];
+                }
+            }, 1000);
         });
         delete userSocketMap[socket.id];
         socket.leave();
