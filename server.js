@@ -2,7 +2,6 @@ import express from 'express';
 import http from 'http';
 import path from 'path';
 import { Server } from 'socket.io';
-import ACTIONS from './Actions.js';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -32,13 +31,13 @@ function getAllConnectedClients(roomId) {
 io.on('connection', (socket) => {
     console.log('a user connected', socket.id);
 
-    socket.on(ACTIONS.JOIN, ({ roomId, username }) => {
+    socket.on("join", ({ roomId, username }) => {
         userSocketMap[socket.id] = username;
         socket.join(roomId);
         const clients = getAllConnectedClients(roomId);
         const messages = roomMessages[roomId] || [];
 
-        socket.emit(ACTIONS.JOINED, {
+        socket.emit("joined", {
             clients,
             username,
             socketId: socket.id,
@@ -46,7 +45,7 @@ io.on('connection', (socket) => {
         });
 
         clients.forEach(({ socketId }) => {
-            io.to(socketId).emit(ACTIONS.JOINED, {
+            io.to(socketId).emit("joined", {
                 clients,
                 username,
                 socketId: socket.id,
@@ -55,18 +54,18 @@ io.on('connection', (socket) => {
         });
     });
 
-    socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
-        socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code });
+    socket.on("code-change", ({ roomId, code }) => {
+        socket.in(roomId).emit("code-change", { code });
     });
 
-    socket.on(ACTIONS.SYNC_CODE, ({ socketId, code }) => {
-        io.to(socketId).emit(ACTIONS.CODE_CHANGE, { code });
+    socket.on("sync-code", ({ socketId, code }) => {
+        io.to(socketId).emit("code-change", { code });
     });
 
     socket.on('disconnecting', () => {
         const rooms = [...socket.rooms];
         rooms.forEach((roomId) => {
-            socket.in(roomId).emit(ACTIONS.DISCONNECTED, {
+            socket.in(roomId).emit("disconnected", {
                 socketId: socket.id,
                 username: userSocketMap[socket.id],
             });

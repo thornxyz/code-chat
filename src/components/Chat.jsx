@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import sendlogo from "./send.svg";
-import ACTIONS from "../../Actions";
 
 function Chat({ socketRef, username, room }) {
   const [currentMessage, setCurrentMessage] = useState("");
@@ -44,13 +43,13 @@ function Chat({ socketRef, username, room }) {
 
     if (socketRef.current) {
       socketRef.current.on("receive_message", handleMessageReceive);
-      socketRef.current.on(ACTIONS.JOINED, handleJoin);
+      socketRef.current.on("joined", handleJoin);
     }
 
     return () => {
       if (socketRef.current) {
         socketRef.current.off("receive_message", handleMessageReceive);
-        socketRef.current.off(ACTIONS.JOINED, handleJoin);
+        socketRef.current.off("joined", handleJoin);
       }
     };
   }, [socketRef.current]);

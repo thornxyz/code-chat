@@ -24,7 +24,7 @@ const Dropdown = ({ options, onSelect, defaultValue }) => {
       style={{ width: "140px" }}
     >
       <div
-        className="flex justify-between items-center p-1 rounded-md bg-gray-700 cursor-pointer"
+        className="flex justify-between items-center px-2 py-1 rounded-md bg-gray-700 cursor-pointer"
         onClick={toggleDropdown}
       >
         {selectedOption || "Select option"}

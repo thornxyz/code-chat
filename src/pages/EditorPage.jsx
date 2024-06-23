@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import Editor from "../components/Editor";
 import { initSocket } from "../socket";
-import ACTIONS from "../../Actions";
 import {
   Navigate,
   useLocation,
@@ -32,23 +31,23 @@ function EditorPage() {
         reactNavigator("/");
       }
 
-      socketRef.current.emit(ACTIONS.JOIN, {
+      socketRef.current.emit("join", {
         roomId,
         username: location.state?.username,
       });
 
       socketRef.current.on(
-        ACTIONS.JOINED,
+        "joined",
         ({ clients: newClients, username, socketId }) => {
           setClients(newClients);
-          socketRef.current.emit(ACTIONS.SYNC_CODE, {
+          socketRef.current.emit("sync-code", {
             code: codeRef.current,
             socketId,
           });
         }
       );
 
-      socketRef.current.on(ACTIONS.DISCONNECTED, ({ socketId, username }) => {
+      socketRef.current.on("disconnected", ({ socketId, username }) => {
         setClients((prevClients) =>
           prevClients.filter((client) => client.socketId !== socketId)
         );
@@ -59,8 +58,8 @@ function EditorPage() {
 
     return () => {
       if (socketRef.current) {
-        socketRef.current.off(ACTIONS.JOINED);
-        socketRef.current.off(ACTIONS.DISCONNECTED);
+        socketRef.current.off("joined");
+        socketRef.current.off("disconnected");
         socketRef.current.disconnect();
       }
     };
@@ -82,12 +81,12 @@ function EditorPage() {
         );
       };
 
-      socketRef.current.on(ACTIONS.JOINED, handleJoin);
-      socketRef.current.on(ACTIONS.DISCONNECTED, handleDisconnect);
+      socketRef.current.on("joined", handleJoin);
+      socketRef.current.on("disconnected", handleDisconnect);
 
       return () => {
-        socketRef.current.off(ACTIONS.JOINED, handleJoin);
-        socketRef.current.off(ACTIONS.DISCONNECTED, handleDisconnect);
+        socketRef.current.off("joined", handleJoin);
+        socketRef.current.off("disconnected", handleDisconnect);
       };
     }
   }, [location.state?.username, socketRef.current]);
@@ -97,7 +96,7 @@ function EditorPage() {
   }
 
   return (
-    <div className="flex flex-col w-screen h-screen bg-sky-950 text-white">
+    <div className="flex flex-col w-screen h-screen bg-sky-950 text-white overflow-x-hidden">
       <Navbar clients={clients} roomId={roomId} />
       <div className="flex border-t">
         <Editor
