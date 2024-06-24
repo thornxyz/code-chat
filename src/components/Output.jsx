@@ -57,7 +57,11 @@ const statuses = [
   },
 ];
 
-const Output = ({ output }) => {
+const Output = ({ output, input, setInput }) => {
+  const handleInputChange = (event) => {
+    setInput(event.target.value);
+  };
+
   const getOutput = () => {
     if (!output || !output.status) return <></>;
 
@@ -96,9 +100,24 @@ const Output = ({ output }) => {
   };
 
   return (
-    <div className="h-full bg-slate-950 overflow-auto ">
-      <div className="text-sm p-1 font-semibold">Output:</div>
-      <div className="  text-white font-normal text-sm">{getOutput()}</div>
+    <div className="flex h-full">
+      <div className=" bg-slate-950 overflow-auto " style={{ flex: "3 1 0%" }}>
+        <div className="sticky top-0 text-sm p-1 font-semibold">Output:</div>
+        <div className="text-white font-normal text-sm">{getOutput()}</div>
+      </div>
+      <div
+        className=" bg-slate-700 overflow-auto border-l"
+        style={{ flex: "2 1 0%" }}
+      >
+        <div className="sticky top-0 text-sm p-1 font-semibold">Input:</div>
+        <textarea
+          className="text-white text-sm w-full bg-inherit p-2 outline-none resize-none"
+          style={{ height: "80%" }}
+          placeholder="Enter custom stdin..."
+          value={input}
+          onChange={handleInputChange}
+        />
+      </div>
     </div>
   );
 };

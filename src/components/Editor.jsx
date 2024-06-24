@@ -21,6 +21,7 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
   const editorRef = useRef();
+  const [input, setInput] = useState("");
 
   const handleSelect = (option) => {
     switch (option) {
@@ -46,6 +47,7 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
     const formData = {
       language_id: getLanguageId(mode),
       source_code: btoa(code),
+      stdin: btoa(input),
     };
     const options = {
       method: "POST",
@@ -191,9 +193,9 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
       />
       <div
         className="bg-zinc-900 border-t overflow-y-auto"
-        style={{ height: "150px" }}
+        style={{ height: "190px" }}
       >
-        <Output output={output} />
+        <Output output={output} input={input} setInput={setInput} />
       </div>
     </div>
   );

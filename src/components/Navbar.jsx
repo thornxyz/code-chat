@@ -20,7 +20,7 @@ function Navbar({ clients, roomId }) {
   };
 
   return (
-    <div className="flex justify-between my-1 mx-2">
+    <div className="flex justify-between my-0.5 mx-2">
       <div className="flex gap-2">
         {clients.map((client) => (
           <Client key={client.socketId} username={client.username} />
@@ -29,13 +29,13 @@ function Navbar({ clients, roomId }) {
       <div className="flex gap-2">
         <button
           onClick={copyRoomId}
-          className="bg-green-700 px-4 py-1 text-sm font-semibold rounded-lg hover:bg-green-900"
+          className="bg-green-700 px-2 py-0.5 text-sm font-semibold rounded-lg hover:bg-green-900"
         >
           Copy Room Id
         </button>
         <button
           onClick={leaveRoom}
-          className="bg-red-700 px-4 py-1 text-sm font-semibold rounded-lg hover:bg-red-900"
+          className="bg-red-700 px-2 py-0.5 text-sm font-semibold rounded-lg hover:bg-red-900"
         >
           Leave
         </button>

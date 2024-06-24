@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .CodeMirror {
-  height: calc(88.3vh - 150px) !important;
+  height: calc(88.7vh - 190px) !important;
   font-size: 16px;
   line-height: 1.6;
   padding-top: 5px;

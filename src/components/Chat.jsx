@@ -59,7 +59,10 @@ function Chat({ socketRef, username, room }) {
   }, [messageList]);
 
   return (
-    <div className="border-l flex flex-col justify-center bg-gray-800">
+    <div
+      className="border-l flex flex-col justify-center bg-gray-800"
+      style={{ maxHeight: "94.5vh" }}
+    >
       <div
         className="bg-gray-800 text-white py-2 px-1 overflow-auto h-full pt-6"
         style={{ width: "300px" }}
