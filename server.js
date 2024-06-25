@@ -18,6 +18,8 @@ app.use((req, res, next) => {
 
 const userSocketMap = {};
 const roomMessages = {};
+const roomInputs = {};
+const roomModes = {};
 
 function getAllConnectedClients(roomId) {
     return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map((socketId) => {
@@ -36,12 +38,16 @@ io.on('connection', (socket) => {
         socket.join(roomId);
         const clients = getAllConnectedClients(roomId);
         const messages = roomMessages[roomId] || [];
+        const input = roomInputs[roomId] || "";
+        const mode = roomModes[roomId] || "Javascript";
 
         socket.emit("joined", {
             clients,
             username,
             socketId: socket.id,
             messages,
+            input,
+            mode
         });
 
         clients.forEach(({ socketId }) => {
@@ -49,7 +55,9 @@ io.on('connection', (socket) => {
                 clients,
                 username,
                 socketId: socket.id,
-                messages
+                messages,
+                input,
+                mode
             });
         });
     });
@@ -60,6 +68,24 @@ io.on('connection', (socket) => {
 
     socket.on("sync-code", ({ socketId, code }) => {
         io.to(socketId).emit("code-change", { code });
+    });
+
+    socket.on("dropdown-change", ({ roomId, option }) => {
+        roomModes[roomId] = option;
+        socket.in(roomId).emit("dropdown-change", { option });
+    });
+
+    socket.on("input-change", ({ roomId, input }) => {
+        roomInputs[roomId] = input;
+        socket.in(roomId).emit("input-change", { input });
+    });
+
+    socket.on("send_message", (data) => {
+        if (!roomMessages[data.room]) {
+            roomMessages[data.room] = [];
+        }
+        roomMessages[data.room].push(data);
+        socket.to(data.room).emit("receive_message", data);
     });
 
     socket.on('disconnecting', () => {
@@ -74,19 +100,13 @@ io.on('connection', (socket) => {
                 const remainingClients = getAllConnectedClients(roomId);
                 if (remainingClients.length === 0) {
                     delete roomMessages[roomId];
+                    delete roomInputs[roomId];
+                    delete roomModes[roomId];
                 }
             }, 1000);
         });
         delete userSocketMap[socket.id];
         socket.leave();
-    });
-
-    socket.on("send_message", (data) => {
-        if (!roomMessages[data.room]) {
-            roomMessages[data.room] = [];
-        }
-        roomMessages[data.room].push(data);
-        socket.to(data.room).emit("receive_message", data);
     });
 });
 

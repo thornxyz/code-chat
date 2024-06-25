@@ -9,7 +9,8 @@ import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/closebrackets";
 import axios from "axios";
 import run from "./run.svg";
-import Output, { statuses } from "./Output";
+import Output from "./Output";
+import { statuses } from "./statuses";
 import Dropdown from "./Dropdown";
 import toast from "react-hot-toast";
 
@@ -22,8 +23,10 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
   const [loading, setLoading] = useState(false);
   const editorRef = useRef();
   const [input, setInput] = useState("");
+  const [selectedOption, setSelectedOption] = useState(options[0]);
 
-  const handleSelect = (option) => {
+  const handleSelect = (option, emit = true) => {
+    setSelectedOption(option);
     switch (option) {
       case "Javascript":
         setMode("javascript");
@@ -39,6 +42,16 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
         break;
       default:
         setMode("javascript");
+    }
+    if (emit) {
+      socketRef.current.emit("dropdown-change", { roomId, option });
+    }
+  };
+
+  const handleInputChange = (newInput, emit = true) => {
+    setInput(newInput);
+    if (emit) {
+      socketRef.current.emit("input-change", { roomId, input: newInput });
     }
   };
 
@@ -138,9 +151,28 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
           setCode(code);
         }
       });
+
+      socketRef.current.on("dropdown-change", ({ option }) => {
+        handleSelect(option, false);
+      });
+
+      socketRef.current.on("input-change", ({ input }) => {
+        setInput(input);
+      });
+
+      socketRef.current.on("joined", ({ mode, input }) => {
+        if (input) {
+          setInput(input);
+        }
+        if (mode) {
+          handleSelect(mode, false);
+        }
+      });
     }
     return () => {
       socketRef.current.off("code-change");
+      socketRef.current.off("input-change");
+      socketRef.current.off("dropdown-change");
     };
   }, [socketRef.current]);
 
@@ -153,7 +185,7 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
         <Dropdown
           options={options}
           onSelect={handleSelect}
-          defaultValue={options[0]}
+          defaultValue={selectedOption}
         />
 
         {loading ? (
@@ -195,7 +227,7 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
         className="bg-zinc-900 border-t overflow-y-auto"
         style={{ height: "190px" }}
       >
-        <Output output={output} input={input} setInput={setInput} />
+        <Output output={output} input={input} setInput={handleInputChange} />
       </div>
     </div>
   );

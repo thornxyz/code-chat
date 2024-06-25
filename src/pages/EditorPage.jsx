@@ -58,7 +58,7 @@ function EditorPage() {
 
     return () => {
       if (socketRef.current) {
-        socketRef.current.off("joined");
+        // socketRef.current.off("joined");
         socketRef.current.off("disconnected");
         socketRef.current.disconnect();
       }
