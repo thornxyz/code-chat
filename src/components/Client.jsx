@@ -1,4 +1,5 @@
 import Avatar from "react-avatar";
+import PropTypes from "prop-types";
 
 function Client({ username }) {
   return (
@@ -7,5 +8,9 @@ function Client({ username }) {
     </div>
   );
 }
+
+Client.propTypes = {
+  username: PropTypes.string.isRequired,
+};
 
 export default Client;

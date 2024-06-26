@@ -36,18 +36,15 @@ function EditorPage() {
         username: location.state?.username,
       });
 
-      socketRef.current.on(
-        "joined",
-        ({ clients: newClients, username, socketId }) => {
-          setClients(newClients);
-          socketRef.current.emit("sync-code", {
-            code: codeRef.current,
-            socketId,
-          });
-        }
-      );
+      socketRef.current.on("joined", ({ clients: newClients, socketId }) => {
+        setClients(newClients);
+        socketRef.current.emit("sync-code", {
+          code: codeRef.current,
+          socketId,
+        });
+      });
 
-      socketRef.current.on("disconnected", ({ socketId, username }) => {
+      socketRef.current.on("disconnected", ({ socketId }) => {
         setClients((prevClients) =>
           prevClients.filter((client) => client.socketId !== socketId)
         );
@@ -58,7 +55,7 @@ function EditorPage() {
 
     return () => {
       if (socketRef.current) {
-        // socketRef.current.off("joined");
+        socketRef.current.off("joined");
         socketRef.current.off("disconnected");
         socketRef.current.disconnect();
       }
@@ -96,9 +93,9 @@ function EditorPage() {
   }
 
   return (
-    <div className="flex flex-col w-screen h-screen bg-sky-950 text-white overflow-x-hidden">
+    <div className="flex flex-col w-screen h-screen bg-zinc-700 text-white overflow-x-hidden">
       <Navbar clients={clients} roomId={roomId} />
-      <div className="flex border-t">
+      <div className="flex">
         <Editor
           socketRef={socketRef}
           roomId={roomId}

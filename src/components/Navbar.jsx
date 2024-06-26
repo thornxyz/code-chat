@@ -1,6 +1,7 @@
 import Client from "./Client";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 function Navbar({ clients, roomId }) {
   const reactNavigator = useNavigate();
@@ -43,5 +44,10 @@ function Navbar({ clients, roomId }) {
     </div>
   );
 }
+
+Navbar.propTypes = {
+  clients: PropTypes.array.isRequired,
+  roomId: PropTypes.string.isRequired,
+};
 
 export default Navbar;

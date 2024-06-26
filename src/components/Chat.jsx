@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import sendlogo from "./send.svg";
+import PropTypes from "prop-types";
 
 function Chat({ socketRef, username, room }) {
   const [currentMessage, setCurrentMessage] = useState("");
@@ -60,7 +61,7 @@ function Chat({ socketRef, username, room }) {
 
   return (
     <div
-      className="border-l flex flex-col justify-center bg-gray-800"
+      className="flex flex-col justify-center bg-gray-800"
       style={{ maxHeight: "94.5vh" }}
     >
       <div
@@ -113,7 +114,7 @@ function Chat({ socketRef, username, room }) {
       <div className="flex justify-between m-1 mb-4">
         <input
           type="text"
-          className="border-black border px-2 py-1 text-black rounded-sm w-full text-sm"
+          className=" px-2 py-1 text-black rounded-sm w-full text-sm"
           onKeyDown={(event) => {
             event.key === "Enter" && sendMessage();
           }}
@@ -133,5 +134,11 @@ function Chat({ socketRef, username, room }) {
     </div>
   );
 }
+
+Chat.propTypes = {
+  socketRef: PropTypes.object.isRequired,
+  username: PropTypes.string.isRequired,
+  room: PropTypes.string.isRequired,
+};
 
 export default Chat;

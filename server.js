@@ -12,7 +12,7 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 app.use(express.static('dist'));
-app.use((req, res, next) => {
+app.use((req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 })
 
@@ -20,6 +20,7 @@ const userSocketMap = {};
 const roomMessages = {};
 const roomInputs = {};
 const roomModes = {};
+const roomOutputs = {};
 
 function getAllConnectedClients(roomId) {
     return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map((socketId) => {
@@ -40,6 +41,7 @@ io.on('connection', (socket) => {
         const messages = roomMessages[roomId] || [];
         const input = roomInputs[roomId] || "";
         const mode = roomModes[roomId] || "Javascript";
+        const output = roomOutputs[roomId] || "";
 
         socket.emit("joined", {
             clients,
@@ -47,7 +49,8 @@ io.on('connection', (socket) => {
             socketId: socket.id,
             messages,
             input,
-            mode
+            mode,
+            output
         });
 
         clients.forEach(({ socketId }) => {
@@ -57,7 +60,8 @@ io.on('connection', (socket) => {
                 socketId: socket.id,
                 messages,
                 input,
-                mode
+                mode,
+                output
             });
         });
     });
@@ -78,6 +82,11 @@ io.on('connection', (socket) => {
     socket.on("input-change", ({ roomId, input }) => {
         roomInputs[roomId] = input;
         socket.in(roomId).emit("input-change", { input });
+    });
+
+    socket.on("output-change", ({ roomId, output }) => {
+        roomOutputs[roomId] = output;
+        socket.in(roomId).emit("output-change", { output });
     });
 
     socket.on("send_message", (data) => {
@@ -102,6 +111,7 @@ io.on('connection', (socket) => {
                     delete roomMessages[roomId];
                     delete roomInputs[roomId];
                     delete roomModes[roomId];
+                    delete roomOutputs[roomId];
                 }
             }, 1000);
         });

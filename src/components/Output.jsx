@@ -1,4 +1,5 @@
 import { statuses } from "./statuses";
+import PropTypes from "prop-types";
 
 const Output = ({ output, input, setInput }) => {
   const handleInputChange = (event) => {
@@ -48,10 +49,7 @@ const Output = ({ output, input, setInput }) => {
         <div className="sticky top-0 text-sm p-1 font-semibold">Output:</div>
         <div className="text-white font-normal text-sm">{getOutput()}</div>
       </div>
-      <div
-        className=" bg-slate-700 overflow-auto border-l"
-        style={{ flex: "2 1 0%" }}
-      >
+      <div className=" bg-slate-700 overflow-auto" style={{ flex: "2 1 0%" }}>
         <div className="sticky top-0 text-sm p-1 font-semibold">Input:</div>
         <textarea
           className="text-white text-sm w-full bg-inherit p-2 outline-none resize-none"
@@ -63,6 +61,19 @@ const Output = ({ output, input, setInput }) => {
       </div>
     </div>
   );
+};
+
+Output.propTypes = {
+  output: PropTypes.shape({
+    status: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+    }),
+    compile_output: PropTypes.string,
+    stdout: PropTypes.string,
+    stderr: PropTypes.string,
+  }),
+  input: PropTypes.string.isRequired,
+  setInput: PropTypes.func.isRequired,
 };
 
 export default Output;

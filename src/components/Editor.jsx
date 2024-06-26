@@ -13,15 +13,16 @@ import Output from "./Output";
 import { statuses } from "./statuses";
 import Dropdown from "./Dropdown";
 import toast from "react-hot-toast";
+import PropTypes from "prop-types";
 
 const options = ["Javascript", "C", "C++", "Python"];
 
 const Editor = ({ socketRef, roomId, onCodeChange }) => {
-  const [mode, setMode] = useState("javascript");
+  const editorRef = useRef();
+  const [mode, setMode] = useState("Javascript");
   const [code, setCode] = useState("");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
-  const editorRef = useRef();
   const [input, setInput] = useState("");
   const [selectedOption, setSelectedOption] = useState(options[0]);
 
@@ -110,6 +111,10 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
       } else {
         setOutput(response.data);
         setLoading(false);
+        socketRef.current.emit("output-change", {
+          roomId,
+          output: response.data,
+        });
         if (statusId === 3) {
           toast.success("Code executed successfully");
         } else {
@@ -144,35 +149,48 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
   };
 
   useEffect(() => {
-    if (socketRef.current) {
-      socketRef.current.on("code-change", ({ code }) => {
+    const socket = socketRef.current;
+
+    if (socket) {
+      socket.on("code-change", ({ code }) => {
         if (code !== null) {
           editorRef.current.setValue(code);
           setCode(code);
         }
       });
 
-      socketRef.current.on("dropdown-change", ({ option }) => {
+      socket.on("dropdown-change", ({ option }) => {
         handleSelect(option, false);
       });
 
-      socketRef.current.on("input-change", ({ input }) => {
+      socket.on("input-change", ({ input }) => {
         setInput(input);
       });
 
-      socketRef.current.on("joined", ({ mode, input }) => {
+      socket.on("output-change", ({ output }) => {
+        setOutput(output);
+      });
+
+      socket.on("joined", ({ mode, input, output }) => {
         if (input) {
           setInput(input);
         }
         if (mode) {
           handleSelect(mode, false);
         }
+        if (output) {
+          setOutput(output);
+        }
       });
     }
+
     return () => {
-      socketRef.current.off("code-change");
-      socketRef.current.off("input-change");
-      socketRef.current.off("dropdown-change");
+      if (socket) {
+        socket.off("code-change");
+        socket.off("input-change");
+        socket.off("dropdown-change");
+        socket.off("output-change");
+      }
     };
   }, [socketRef.current]);
 
@@ -223,14 +241,17 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
           editorRef.current = editor;
         }}
       />
-      <div
-        className="bg-zinc-900 border-t overflow-y-auto"
-        style={{ height: "190px" }}
-      >
+      <div className="bg-zinc-900 overflow-y-auto" style={{ height: "190px" }}>
         <Output output={output} input={input} setInput={handleInputChange} />
       </div>
     </div>
   );
+};
+
+Editor.propTypes = {
+  socketRef: PropTypes.object.isRequired,
+  roomId: PropTypes.string.isRequired,
+  onCodeChange: PropTypes.func.isRequired,
 };
 
 export default Editor;
