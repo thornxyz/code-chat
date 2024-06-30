@@ -64,14 +64,7 @@ const Output = ({ output, input, setInput }) => {
 };
 
 Output.propTypes = {
-  output: PropTypes.shape({
-    status: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-    }),
-    compile_output: PropTypes.string,
-    stdout: PropTypes.string,
-    stderr: PropTypes.string,
-  }),
+  output: PropTypes.any.isRequired,
   input: PropTypes.string.isRequired,
   setInput: PropTypes.func.isRequired,
 };

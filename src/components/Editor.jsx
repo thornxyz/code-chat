@@ -17,9 +17,9 @@ import PropTypes from "prop-types";
 
 const options = ["Javascript", "C", "C++", "Python"];
 
-const Editor = ({ socketRef, roomId, onCodeChange }) => {
+const Editor = ({ socketRef, roomId, onCodeChange, onDropdownChange }) => {
   const editorRef = useRef();
-  const [mode, setMode] = useState("Javascript");
+  const [mode, setMode] = useState("javascript");
   const [code, setCode] = useState("");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +27,11 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
   const [selectedOption, setSelectedOption] = useState(options[0]);
 
   const handleSelect = (option, emit = true) => {
+    onDropdownChange(option);
     setSelectedOption(option);
+    if (emit) {
+      socketRef.current.emit("dropdown-change", { roomId, option });
+    }
     switch (option) {
       case "Javascript":
         setMode("javascript");
@@ -43,9 +47,6 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
         break;
       default:
         setMode("javascript");
-    }
-    if (emit) {
-      socketRef.current.emit("dropdown-change", { roomId, option });
     }
   };
 
@@ -171,12 +172,9 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
         setOutput(output);
       });
 
-      socket.on("joined", ({ mode, input, output }) => {
+      socket.on("joined", ({ input, output }) => {
         if (input) {
           setInput(input);
-        }
-        if (mode) {
-          handleSelect(mode, false);
         }
         if (output) {
           setOutput(output);
@@ -203,7 +201,7 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
         <Dropdown
           options={options}
           onSelect={handleSelect}
-          defaultValue={selectedOption}
+          selectedOption={selectedOption}
         />
 
         {loading ? (
@@ -252,6 +250,7 @@ Editor.propTypes = {
   socketRef: PropTypes.object.isRequired,
   roomId: PropTypes.string.isRequired,
   onCodeChange: PropTypes.func.isRequired,
+  onDropdownChange: PropTypes.func.isRequired,
 };
 
 export default Editor;

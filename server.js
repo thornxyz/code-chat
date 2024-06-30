@@ -19,7 +19,6 @@ app.use((req, res) => {
 const userSocketMap = {};
 const roomMessages = {};
 const roomInputs = {};
-const roomModes = {};
 const roomOutputs = {};
 
 function getAllConnectedClients(roomId) {
@@ -40,7 +39,6 @@ io.on('connection', (socket) => {
         const clients = getAllConnectedClients(roomId);
         const messages = roomMessages[roomId] || [];
         const input = roomInputs[roomId] || "";
-        const mode = roomModes[roomId] || "Javascript";
         const output = roomOutputs[roomId] || "";
 
         socket.emit("joined", {
@@ -49,7 +47,6 @@ io.on('connection', (socket) => {
             socketId: socket.id,
             messages,
             input,
-            mode,
             output
         });
 
@@ -60,7 +57,6 @@ io.on('connection', (socket) => {
                 socketId: socket.id,
                 messages,
                 input,
-                mode,
                 output
             });
         });
@@ -75,8 +71,11 @@ io.on('connection', (socket) => {
     });
 
     socket.on("dropdown-change", ({ roomId, option }) => {
-        roomModes[roomId] = option;
         socket.in(roomId).emit("dropdown-change", { option });
+    });
+
+    socket.on("sync-dropdown", ({ socketId, option }) => {
+        io.to(socketId).emit("dropdown-change", { option });
     });
 
     socket.on("input-change", ({ roomId, input }) => {
@@ -110,7 +109,6 @@ io.on('connection', (socket) => {
                 if (remainingClients.length === 0) {
                     delete roomMessages[roomId];
                     delete roomInputs[roomId];
-                    delete roomModes[roomId];
                     delete roomOutputs[roomId];
                 }
             }, 1000);

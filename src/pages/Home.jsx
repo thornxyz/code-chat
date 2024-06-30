@@ -31,24 +31,22 @@ function Home() {
   };
 
   return (
-    <div className="w-screen flex flex-col items-center bg-sky-950 h-screen text-white pt-12">
-      <div className="text-2xl font-bold mb-8" style={{ marginTop: "20vh" }}>
-        Paste invitation for Room Id
-      </div>
-      <div className="flex flex-col w-1/2 items-center gap-4">
+    <div className="flex flex-col justify-center items-center h-screen bg-slate-400">
+      <div className="bg-zinc-600 p-6 rounded-lg w-full max-w-sm m-4 flex flex-col items-center">
+        <div className="font-semibold text-white py-1 mb-4 text-3xl">
+          Join a room
+        </div>
         <input
           type="text"
-          className="px-2 py-1 rounded-sm text-black"
-          style={{ width: "30vw" }}
-          placeholder="Room Id"
+          className="w-full py-2 px-2 my-2 rounded-sm"
+          placeholder="Paste Room Id"
           onChange={(e) => setRoomId(e.target.value)}
           value={roomId}
           onKeyUp={handleInputEnter}
         />
         <input
           type="text"
-          className="px-2 py-1 rounded-sm text-black"
-          style={{ width: "30vw" }}
+          className="w-full py-2 px-2 my-2 rounded-sm mb-7"
           placeholder="Username"
           onChange={(e) => setUsername(e.target.value)}
           value={username}
@@ -56,20 +54,17 @@ function Home() {
         />
         <button
           onClick={joinRoom}
-          className="bg-green-700 px-4 py-1 mt-2 text-xl font-semibold rounded-md hover:bg-green-900"
+          className="bg-blue-500 my-1 rounded-md w-full py-2 text-white font-semibold text-lg hover:bg-blue-700"
         >
           Join
         </button>
-        <div className="mt-4">
-          If you dont have an invite then create &nbsp;
-          <span
-            onClick={createNewRoom}
-            className="bg-green-700 hover:bg-green-900 px-2 py-1 rounded-md font-semibold cursor-pointer"
-            href=""
-          >
-            New Room
-          </span>
-        </div>
+        <div className="text-white font-medium">Or</div>
+        <button
+          onClick={createNewRoom}
+          className="bg-green-700 my-1 rounded-md w-full py-2 text-white font-semibold text-lg hover:bg-green-900"
+        >
+          Create New Room
+        </button>
       </div>
     </div>
   );

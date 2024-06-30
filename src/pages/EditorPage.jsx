@@ -14,6 +14,7 @@ import Navbar from "../components/Navbar";
 function EditorPage() {
   const socketRef = useRef(null);
   const codeRef = useRef(null);
+  const dropDownRef = useRef(null);
   const location = useLocation();
   const reactNavigator = useNavigate();
   const { roomId } = useParams();
@@ -38,8 +39,14 @@ function EditorPage() {
 
       socketRef.current.on("joined", ({ clients: newClients, socketId }) => {
         setClients(newClients);
+
         socketRef.current.emit("sync-code", {
           code: codeRef.current,
+          socketId,
+        });
+
+        socketRef.current.emit("sync-dropdown", {
+          option: dropDownRef.current,
           socketId,
         });
       });
@@ -101,6 +108,9 @@ function EditorPage() {
           roomId={roomId}
           onCodeChange={(code) => {
             codeRef.current = code;
+          }}
+          onDropdownChange={(option) => {
+            dropDownRef.current = option;
           }}
         />
         <Chat
