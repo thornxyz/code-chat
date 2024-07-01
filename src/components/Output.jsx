@@ -1,7 +1,7 @@
-import { statuses } from "./statuses";
+import { statuses } from "./codeExec";
 import PropTypes from "prop-types";
 
-const Output = ({ output, input, setInput }) => {
+const Output = ({ output, input, setInput, clearOutput }) => {
   const handleInputChange = (event) => {
     setInput(event.target.value);
   };
@@ -46,7 +46,15 @@ const Output = ({ output, input, setInput }) => {
   return (
     <div className="flex h-full">
       <div className=" bg-slate-950 overflow-auto " style={{ flex: "3 1 0%" }}>
-        <div className="sticky top-0 text-sm p-1 font-semibold">Output:</div>
+        <div className="flex sticky top-0 text-sm p-1 font-semibold justify-between">
+          <div>Output:</div>
+          <div
+            className="bg-blue-700 hover:bg-blue-900 cursor-pointer rounded-sm px-1"
+            onClick={clearOutput}
+          >
+            Clear
+          </div>
+        </div>
         <div className="text-white font-normal text-sm">{getOutput()}</div>
       </div>
       <div className=" bg-slate-700 overflow-auto" style={{ flex: "2 1 0%" }}>
@@ -67,6 +75,7 @@ Output.propTypes = {
   output: PropTypes.any.isRequired,
   input: PropTypes.string.isRequired,
   setInput: PropTypes.func.isRequired,
+  clearOutput: PropTypes.func.isRequired,
 };
 
 export default Output;
