@@ -18,7 +18,6 @@ app.use((req, res) => {
 
 const userSocketMap = {};
 const roomMessages = {};
-const roomInputs = {};
 const roomOutputs = {};
 
 function getAllConnectedClients(roomId) {
@@ -38,7 +37,6 @@ io.on('connection', (socket) => {
         socket.join(roomId);
         const clients = getAllConnectedClients(roomId);
         const messages = roomMessages[roomId] || [];
-        const input = roomInputs[roomId] || "";
         const output = roomOutputs[roomId] || "";
 
         socket.emit("joined", {
@@ -46,7 +44,6 @@ io.on('connection', (socket) => {
             username,
             socketId: socket.id,
             messages,
-            input,
             output
         });
 
@@ -56,7 +53,6 @@ io.on('connection', (socket) => {
                 username,
                 socketId: socket.id,
                 messages,
-                input,
                 output
             });
         });
@@ -79,8 +75,11 @@ io.on('connection', (socket) => {
     });
 
     socket.on("input-change", ({ roomId, input }) => {
-        roomInputs[roomId] = input;
         socket.in(roomId).emit("input-change", { input });
+    });
+
+    socket.on("sync-input", ({ socketId, input }) => {
+        io.to(socketId).emit("input-change", { input });
     });
 
     socket.on("output-change", ({ roomId, output }) => {
@@ -108,7 +107,6 @@ io.on('connection', (socket) => {
                 const remainingClients = getAllConnectedClients(roomId);
                 if (remainingClients.length === 0) {
                     delete roomMessages[roomId];
-                    delete roomInputs[roomId];
                     delete roomOutputs[roomId];
                 }
             }, 1000);

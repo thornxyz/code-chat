@@ -15,6 +15,7 @@ function EditorPage() {
   const socketRef = useRef(null);
   const codeRef = useRef(null);
   const dropDownRef = useRef(null);
+  const inputRef = useRef(null);
   const location = useLocation();
   const reactNavigator = useNavigate();
   const { roomId } = useParams();
@@ -47,6 +48,11 @@ function EditorPage() {
 
         socketRef.current.emit("sync-dropdown", {
           option: dropDownRef.current,
+          socketId,
+        });
+
+        socketRef.current.emit("sync-input", {
+          input: inputRef.current,
           socketId,
         });
       });
@@ -111,6 +117,9 @@ function EditorPage() {
           }}
           onDropdownChange={(option) => {
             dropDownRef.current = option;
+          }}
+          onInputChange={(input) => {
+            inputRef.current = input;
           }}
         />
         <Chat

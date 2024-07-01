@@ -1,9 +1,10 @@
 import { statuses } from "./codeExec";
 import PropTypes from "prop-types";
 
-const Output = ({ output, input, setInput, clearOutput }) => {
-  const handleInputChange = (event) => {
-    setInput(event.target.value);
+const Output = ({ output, clearOutput, input, setInput }) => {
+  const handleInputChange = (e) => {
+    const newInput = e.target.value;
+    setInput(newInput, true);
   };
 
   const getOutput = () => {
@@ -73,9 +74,9 @@ const Output = ({ output, input, setInput, clearOutput }) => {
 
 Output.propTypes = {
   output: PropTypes.any.isRequired,
+  clearOutput: PropTypes.func.isRequired,
   input: PropTypes.string.isRequired,
   setInput: PropTypes.func.isRequired,
-  clearOutput: PropTypes.func.isRequired,
 };
 
 export default Output;

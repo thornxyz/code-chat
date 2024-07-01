@@ -14,13 +14,19 @@ import PropTypes from "prop-types";
 
 const options = ["Javascript", "C", "C++", "Python"];
 
-const Editor = ({ socketRef, roomId, onCodeChange, onDropdownChange }) => {
+const Editor = ({
+  socketRef,
+  roomId,
+  onCodeChange,
+  onDropdownChange,
+  onInputChange,
+}) => {
   const editorRef = useRef();
+  const [input, setInput] = useState("");
   const [mode, setMode] = useState("");
   const [code, setCode] = useState("");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [input, setInput] = useState("");
   const [selectedOption, setSelectedOption] = useState(options[0]);
 
   const handleDropdown = (e) => {
@@ -52,13 +58,15 @@ const Editor = ({ socketRef, roomId, onCodeChange, onDropdownChange }) => {
           setMode("javascript");
       }
     }
-    console.log(`option: ${option}`);
   };
 
   const handleInputChange = (newInput, emit = true) => {
-    setInput(newInput);
-    if (emit) {
-      socketRef.current.emit("input-change", { roomId, input: newInput });
+    if (newInput !== null) {
+      setInput(newInput);
+      onInputChange(newInput);
+      if (emit) {
+        socketRef.current.emit("input-change", { roomId, input: newInput });
+      }
     }
   };
 
@@ -78,17 +86,14 @@ const Editor = ({ socketRef, roomId, onCodeChange, onDropdownChange }) => {
       });
 
       socket.on("input-change", ({ input }) => {
-        setInput(input);
+        handleInputChange(input, false);
       });
 
       socket.on("output-change", ({ output }) => {
         setOutput(output);
       });
 
-      socket.on("joined", ({ input, output }) => {
-        if (input) {
-          setInput(input);
-        }
+      socket.on("joined", ({ output }) => {
         if (output) {
           setOutput(output);
         }
@@ -171,11 +176,11 @@ const Editor = ({ socketRef, roomId, onCodeChange, onDropdownChange }) => {
       <div className="bg-zinc-900 overflow-y-auto" style={{ height: "190px" }}>
         <Output
           output={output}
-          input={input}
-          setInput={handleInputChange}
           clearOutput={() => {
             setOutput("");
           }}
+          input={input}
+          setInput={handleInputChange}
         />
       </div>
     </div>
@@ -187,6 +192,7 @@ Editor.propTypes = {
   roomId: PropTypes.string.isRequired,
   onCodeChange: PropTypes.func.isRequired,
   onDropdownChange: PropTypes.func.isRequired,
+  onInputChange: PropTypes.func.isRequired,
 };
 
 export default Editor;
