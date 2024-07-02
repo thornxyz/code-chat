@@ -1,7 +1,7 @@
-import Client from "./Client";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
+import Avatar from "react-avatar";
 
 function Navbar({ clients, roomId }) {
   const reactNavigator = useNavigate();
@@ -22,9 +22,14 @@ function Navbar({ clients, roomId }) {
 
   return (
     <div className="flex justify-between my-0.5 mx-2">
-      <div className="flex gap-2">
+      <div className="flex gap-2 font-semibold cursor-pointer">
         {clients.map((client) => (
-          <Client key={client.socketId} username={client.username} />
+          <Avatar
+            key={client.socketId}
+            name={client.username}
+            size={30}
+            round="15px"
+          />
         ))}
       </div>
       <div className="flex gap-2">

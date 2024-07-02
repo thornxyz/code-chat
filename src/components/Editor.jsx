@@ -20,10 +20,11 @@ const Editor = ({
   onCodeChange,
   onDropdownChange,
   onInputChange,
+  onOutputChange,
 }) => {
   const editorRef = useRef();
   const [input, setInput] = useState("");
-  const [mode, setMode] = useState("");
+  const [mode, setMode] = useState("javascript");
   const [code, setCode] = useState("");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -70,6 +71,16 @@ const Editor = ({
     }
   };
 
+  const handleOutputChange = (newOutput, emit = true) => {
+    if (newOutput !== null) {
+      setOutput(newOutput);
+      onOutputChange(newOutput);
+      if (emit) {
+        socketRef.current.emit("output-change", { roomId, output: newOutput });
+      }
+    }
+  };
+
   useEffect(() => {
     const socket = socketRef.current;
 
@@ -90,13 +101,7 @@ const Editor = ({
       });
 
       socket.on("output-change", ({ output }) => {
-        setOutput(output);
-      });
-
-      socket.on("joined", ({ output }) => {
-        if (output) {
-          setOutput(output);
-        }
+        handleOutputChange(output, false);
       });
     }
 
@@ -143,7 +148,8 @@ const Editor = ({
                 setLoading,
                 setOutput,
                 socketRef,
-                roomId
+                roomId,
+                onOutputChange
               )
             }
           >
@@ -193,6 +199,7 @@ Editor.propTypes = {
   onCodeChange: PropTypes.func.isRequired,
   onDropdownChange: PropTypes.func.isRequired,
   onInputChange: PropTypes.func.isRequired,
+  onOutputChange: PropTypes.func.isRequired,
 };
 
 export default Editor;

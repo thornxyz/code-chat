@@ -60,7 +60,7 @@ const statuses = [
     },
 ];
 
-const handleRun = async (mode, code, input, setLoading, setOutput, socketRef, roomId) => {
+const handleRun = async (mode, code, input, setLoading, setOutput, socketRef, roomId, onOutputChange) => {
     setLoading(true);
     const formData = {
         language_id: getLanguageId(mode),
@@ -82,7 +82,7 @@ const handleRun = async (mode, code, input, setLoading, setOutput, socketRef, ro
     try {
         const response = await axios.request(options);
         const token = response.data.token;
-        await checkStatus(token, setOutput, setLoading, socketRef, roomId);
+        await checkStatus(token, setOutput, setLoading, socketRef, roomId, onOutputChange);
     } catch (err) {
         const error = err.response ? err.response.data : err;
         console.log(error);
@@ -91,7 +91,7 @@ const handleRun = async (mode, code, input, setLoading, setOutput, socketRef, ro
     }
 };
 
-const checkStatus = async (token, setOutput, setLoading, socketRef, roomId) => {
+const checkStatus = async (token, setOutput, setLoading, socketRef, roomId, onOutputChange) => {
     const options = {
         method: "GET",
         url: `${import.meta.env.VITE_RAPID_API_URL}/${token}`,
@@ -112,6 +112,7 @@ const checkStatus = async (token, setOutput, setLoading, socketRef, roomId) => {
             }, 2000);
         } else {
             setOutput(response.data);
+            onOutputChange(response.data);
             setLoading(false);
             socketRef.current.emit("output-change", {
                 roomId,

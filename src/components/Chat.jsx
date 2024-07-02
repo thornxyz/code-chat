@@ -34,6 +34,8 @@ function Chat({ socketRef, username, room }) {
   };
 
   useEffect(() => {
+    const socket = socketRef.current;
+
     const handleMessageReceive = (data) => {
       setMessageList((prevMessages) => [...prevMessages, data]);
     };
@@ -42,15 +44,15 @@ function Chat({ socketRef, username, room }) {
       setMessageList(messages);
     };
 
-    if (socketRef.current) {
-      socketRef.current.on("receive_message", handleMessageReceive);
-      socketRef.current.on("joined", handleJoin);
+    if (socket) {
+      socket.on("receive_message", handleMessageReceive);
+      socket.on("joined", handleJoin);
     }
 
     return () => {
-      if (socketRef.current) {
-        socketRef.current.off("receive_message", handleMessageReceive);
-        socketRef.current.off("joined", handleJoin);
+      if (socket) {
+        socket.off("receive_message", handleMessageReceive);
+        socket.off("joined", handleJoin);
       }
     };
   }, [socketRef.current]);

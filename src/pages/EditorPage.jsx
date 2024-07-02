@@ -16,6 +16,7 @@ function EditorPage() {
   const codeRef = useRef(null);
   const dropDownRef = useRef(null);
   const inputRef = useRef(null);
+  const outputRef = useRef(null);
   const location = useLocation();
   const reactNavigator = useNavigate();
   const { roomId } = useParams();
@@ -53,6 +54,11 @@ function EditorPage() {
 
         socketRef.current.emit("sync-input", {
           input: inputRef.current,
+          socketId,
+        });
+
+        socketRef.current.emit("sync-output", {
+          output: outputRef.current,
           socketId,
         });
       });
@@ -120,6 +126,9 @@ function EditorPage() {
           }}
           onInputChange={(input) => {
             inputRef.current = input;
+          }}
+          onOutputChange={(output) => {
+            outputRef.current = output;
           }}
         />
         <Chat
